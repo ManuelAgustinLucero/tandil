@@ -1,0 +1,178 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="header">
+                            <h4 class="title">Lista de Ventas</h4>
+
+                            <br>
+                            {#<p class="category">Here is a subtitle for this table</p>#}
+                        </div>
+                        <div class="content table-responsive table-full-width">
+                            <div class="text-center">
+                                <div class="row">
+                                    <div class="text-center">
+                                        <label for="">Selecione fecha para filtrar</label>
+                                        <input id="fechaselecionada"  class="form-inline" type="date">
+                                        <button class="btn btn-info btn-fill btn-wd" onclick="fecha()">Filtrar</button>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <table id="venta" class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th class="text-center">Venta</th>
+                                    <th class="text-center">Cliente</th>
+
+                                    <th class="text-center">Total</th>
+                                    <th class="text-center">Fecha</th>
+                                    <th class="text-center">Aciones</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for ventum in ventas %}
+                                    <tr>
+                                        <td class="text-center"><a href="{{ path('admin_venta_show', { 'id': ventum.id }) }}">{{ ventum.id }}</a></td>
+                                        <td class="text-center">{{ ventum.cliente }}</td>
+
+                                        <td class="text-center">${{ ventum.total }}</td>
+
+                                        <td class="text-center">{% if ventum.fecha %}{{ ventum.fecha|date('d-m-Y ') }}{% endif %}</td>
+                                        <td class="text-center">
+
+                                            {#<a class="btn btn-link btn-primary" href="{{ path('admin_venta_show', { 'id': ventum.id }) }}">Detalle</a>#}
+                                            <a class="btn btn-info btn-fill btn-wd text-center" target="_blank" href="{{ path('pdfVenta', { 'id': ventum.id }) }}">Export Pdf</a>
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-6 col-md-offset-5">
+                                    <a class="btn btn-info btn-fill btn-wd" href="{{ path('admin_venta_new') }}">Nueva Venta</a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        var table = $('#venta').DataTable({
+            "lengthMenu": [ [20, 50,100, -1], [ 20, 50,100, "Todos"] ],
+
+            "language": {
+                "sProcessing":    "Procesando...",
+                "sLengthMenu":    "Mostrar _MENU_ registros",
+                "sZeroRecords":   "No se encontraron resultados",
+                "sEmptyTable":    "Ningún dato disponible en esta tabla",
+                "sInfo":          "Mostrando registros del _START_ al _END_ de un total de _TOTAL_ registros",
+                "sInfoEmpty":     "Mostrando registros del 0 al 0 de un total de 0 registros",
+                "sInfoFiltered":  "(filtrado de un total de _MAX_ registros)",
+                "sInfoPostFix":   "",
+                "sSearch":        "Buscar:",
+                "sUrl":           "",
+                "sInfoThousands":  ",",
+                "sLoadingRecords": "Cargando...",
+                "oPaginate": {
+                    "sFirst":    "Primero",
+                    "sLast":    "Último",
+                    "sNext":    "Siguiente",
+                    "sPrevious": "Anterior"
+                },
+                "oAria": {
+                    "sSortAscending":  ": Activar para ordenar la columna de manera ascendente",
+                    "sSortDescending": ": Activar para ordenar la columna de manera descendente"
+                }
+
+            },
+            dom: 'B <"clear"> lfrtip',
+            order: [[ 1, "desc" ]],
+
+            buttons: [
+                {
+                    extend: 'csvHtml5',
+                    exportOptions: {
+                        columns: [   0,1,2,3 ]
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: [   0,1,2,3 ]
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    exportOptions: {
+                        columns: [   0,1,2,3 ]
+
+                    },
+                    pageSize: 'LEGAL'
+
+                },
+                {
+                    extend: 'print',
+                    exportOptions: {
+                        columns: [   0,1,2,3 ]
+                    }
+                }
+
+            ]
+
+        });
+
+
+    </script>
+    <script type="text/javascript">
+
+
+
+
+        function fecha() {
+            var fecha=$("#fechaselecionada").val();
+            if (fecha != ''){
+                location.href = "http://127.0.0.1:8000/venta/fechaVenta/"+fecha;
+
+            } else{
+                $.notify({
+                    icon: 'ti-check-box',
+                    message: "Seleciona una fecha"
+
+                },{
+                    type: 'warning',
+                    timer: 4000
+                });
+            }
+
+            {#$(document).ready(function () {#}
+            {#$.ajax({#}
+            {#type: "POST",#}
+            {#url: "{{ path ("fechaVenta") }}",#}
+            {#data: {fecha:fecha}#}
+            {#}).done(function (data) {#}
+
+            {#console.log(data);#}
+
+            {#});#}
+
+            {#})#}
+        }
+    </script>
+{% endblock %}

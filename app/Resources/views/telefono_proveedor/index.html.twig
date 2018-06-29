@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="header">
+                            <h4 class="title">Lista de telefonos</h4>
+
+                            <br>
+                            {#<p class="category">Here is a subtitle for this table</p>#}
+                        </div>
+                        <div class="content table-responsive table-full-width">
+                            <table id="proveedores" class="table table-striped">
+                                <thead>
+                                <tr>
+                                    <th class="text-center">Telefono</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for telefono_Proveedor in telefono_Proveedors %}
+                                    <tr>
+                                        <td class="text-center">{{ telefono_Proveedor.telefono }}</td>
+                                        <td class="text-center">
+
+                                            <br>
+                                                    <a href="{{ path('admin_telefono_proveedor_delete', { 'id': telefono_Proveedor.id, 'idreturn': id  }) }}">Eliminar</a>
+
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-6 col-md-offset-5">
+                                    <a  class="btn btn-info btn-fill btn-wd"  href="{{ path('admin_proveedor_index') }}">Volver a la lista</a>
+
+                                    <a class="btn btn-info btn-fill btn-wd" href="{{ path('admin_telefono_proveedor_new',{'id':id}) }}">Cargar nuevo telefono</a>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+    {#<ul>#}
+        {#<li>#}
+            {#<a href="{{ path('admin_telefono_proveedor_new') }}">Create a new telefono_Proveedor</a>#}
+        {#</li>#}
+    {#</ul>#}
+{% endblock %}

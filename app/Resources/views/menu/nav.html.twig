@@ -1,0 +1,130 @@
+
+<div class="sidebar" data-background-color="white" data-active-color="danger">
+
+    <div class="sidebar-wrapper ">
+        <div class="logo">
+            <a class="simple-text text-success">
+                Beniar
+            </a>
+
+        </div>
+
+        <div class="box">
+            <ul class="nav">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <li  class="">
+                        <a href="{{ path('homepage')}}">
+                            <p>Home</p>
+                        </a>
+                    </li>
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_cliente_index')}}">
+                            <p>Cliente</p>
+                        </a>
+                    </li>
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_venta_index')}}">
+                            <p>Ventas</p>
+                        </a>
+                    </li>
+                    <li >
+                        <a href="{{ path('admin_venta_new')}}">
+                            <p>Nueva venta</p>
+                        </a>
+                    </li>
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_compra_new')}}">
+                            <p>Cargar compra</p>
+                        </a>
+                    </li>
+                    {#<li >#}
+                        {#<a href="{{ path('admin_cliente_new')}}">#}
+                            {#<i class="ti-pin2"></i>#}
+                            {#<p>Crear Cliente</p>#}
+                        {#</a>#}
+                    {#</li>#}
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_stock_index')}}">
+                            <p>Stock</p>
+                        </a>
+                    </li>
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_proveedor_index')}}">
+                            <p>Proveedores</p>
+                        </a>
+                    </li>
+                    {#<li >#}
+                        {#<a href="{{ path('admin_proveedor_new')}}">#}
+                            {#<i class="ti-pin2"></i>#}
+                            {#<p>Crear Proveedor</p>#}
+                        {#</a>#}
+                    {#</li>#}
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_producto_index')}}">
+                            <p>Productos</p>
+                        </a>
+                    </li>
+                    {#<li >#}
+                        {#<a href="{{ path('admin_producto_new')}}">#}
+                            {#<i class="ti-pin2"></i>#}
+                            {#<p>Crear Producto</p>#}
+                        {#</a>#}
+                    {#</li>#}
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_familia_index')}}">
+                            <p>Categorias</p>
+                        </a>
+                    </li>
+                    {#<li >#}
+                        {#<a href="{{ path('admin_familia_new')}}">#}
+                            {#<i class="ti-pin2"></i>#}
+                            {#<p>Crear Familia</p>#}
+                        {#</a>#}
+                    {#</li>#}
+                    <hr>
+                    <li >
+                        <a href="{{ path('admin_compra_index')}}">
+                            <p>Historial de Compras</p>
+                        </a>
+                    </li>
+
+
+
+
+                    {#<li >#}
+                        {#<a href="{{ path('admin_venta_index')}}">#}
+                            {#<i class="ti-view-list-alt"></i>#}
+                            {#<p>Ventas</p>#}
+                        {#</a>#}
+                    {#</li>#}
+                    {#<li >#}
+                        {#<a href="{{ path('admin_venta_new')}}">#}
+                            {#<i class="ti-pin2"></i>#}
+                            {#<p>Crear Venta</p>#}
+                        {#</a>#}
+                    {#</li>#}
+                    <hr>
+                    <li>
+                        <a class="" href="{{ path('fos_user_security_logout') }}">
+                            {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
+
+
+                        </a>
+                    </li>
+
+
+                {% endif %}
+
+            </ul>
+        </div>
+
+    </div>
+</div>
+

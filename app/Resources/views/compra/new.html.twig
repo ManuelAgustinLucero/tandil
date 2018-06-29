@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    {#<h1>Compra creation</h1>#}
+
+    {#{{ form_start(form) }}#}
+        {#{{ form_widget(form) }}#}
+        {#<input type="submit" value="Create" />#}
+    {#{{ form_end(form) }}#}
+
+    {#<ul>#}
+        {#<li>#}
+            {#<a href="{{ path('admin_compra_index') }}">Back to the list</a>#}
+        {#</li>#}
+    {#</ul>#}
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-8 col-md-7 col-lg-offset-2">
+                    <div class="card">
+                        <div class="header">
+                            <h4 class="title text-center">Compra a proveedores</h4>
+                            {% for flash_message in app.session.flashbag.get('notice') %}
+                                <div class="flash-notice text-success text-center ">
+                                    <h4>{{ flash_message }}</h4>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <div class="content">
+                            {{ form_start(form) }}
+                            <div class="row">
+
+                                <div class="col-md-6" >
+                                    <div class="form-group">
+                                        <label class="text-center">Proveedor</label>
+                                        {{ form_widget(form.proveedor, { 'attr': {'class':'form-control border-input'}})}}
+                                    </div>
+                                </div>
+                                <div class="col-md-6" >
+                                    <div class="form-group" >
+                                        <label>Producto</label>
+                                        {{ form_widget(form.producto, { 'attr': {'class':'form-control border-input'}})}}
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6" >
+                                    <div class="form-group" >
+                                        <label>Cantidad</label>
+                                        {{ form_widget(form.cantidad, { 'attr': {'class':'form-control border-input'}})}}
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6" >
+                                    <div class="form-group">
+                                        <label class="text-center">Precio Compra</label>
+                                        {{ form_widget(form.precioCompra, { 'attr': {'class':'form-control border-input'}})}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {#<div class="row">#}
+
+                                {#<div class="col-md-6 ">#}
+                                    {#<div class="form-group">#}
+                                        {#<label class="text-center">Precio Venta</label>#}
+                                        {#{{ form_widget( form.precioVenta , { 'attr': {'class':'form-control border-input'}})}}#}
+                                    {#</div>#}
+                                {#</div>#}
+                                {#<div class="col-md-6 ">#}
+                                    {#<div class="form-group ">#}
+                                        {#<label class="text-center"> Precio Venta Descuento</label>#}
+                                        {#{{ form_widget(form.precioVentaDescuento, { 'attr': {'class':'form-control border-input'}})}}#}
+                                    {#</div>#}
+
+                                {#</div>#}
+                            {#</div>#}
+
+                            <div class="row">
+                                {#<div class="col-md-6 ">#}
+                                    {#<div class="form-group">#}
+                                        {#<label class="text-center">Codigo</label>#}
+                                        {#{{ form_widget( form.codigo, { 'attr': {'class':'form-control border-input'}})}}#}
+                                    {#</div>#}
+                                {#</div>#}
+                                <div class="col-md-6 hide">
+                                    <div class="form-group">
+                                        <label class="text-center">fecha Registro</label>
+                                        {{ form_widget( form.fechaRegistro , { 'attr': {'class':'form-control border-input'}})}}
+                                    </div>
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="text-center">
+                                <a  class="btn btn-info btn-fill btn-wd"  href="{{ path('admin_compra_index') }}">Volver a la lista</a>
+
+                                <input class="btn btn-success btn-fill btn-wd" type="submit" value="Crear" />
+                            </div>
+                            <div class="clearfix"></div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+<script>
+    $(document).ready(function() { $("#appbundle_compra_proveedor").select2(); });
+    $(document).ready(function() { $("#appbundle_compra_producto").select2(); });
+
+</script>
+{% endblock %}

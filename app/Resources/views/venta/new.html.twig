@@ -1,0 +1,347 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-lg-10 col-lg-offset-1 ">
+                    <div class="card">
+                        <div class="header">
+                            <h4 class="title text-center">VENTA</h4>
+
+                        </div>
+                        <div class="content">
+                            <div class="row">
+                                <div class="col-md-4 bg-success col-lg-offset-2" >
+                                    <div class="form-inline text-center" >
+                                        <label>Total:</label>
+                                        <span  id="total"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 bg-success " >
+                                    <div class="form-inline text-center" >
+                                        <label>fecha:</label>
+                                        <span >{{ "now"|date("d/m/Y") }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="row">
+
+
+                                <div class="col-md-4 col-lg-offset-2">
+                                    <div class="form-group text-center">
+                                        <label>Cliente:</label>
+                                        <select  class="form-control border-input" name="" id="idCliente">
+                                            <option value=""></option>
+
+                                            {% for cliente in clientes %}
+                                                <option value="{{ cliente.id }}">{{ cliente.nombre }}</option>
+
+                                            {% endfor %}
+
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 ">
+                                    <div class="form-group text-center">
+                                        <label>Producto:</label>
+                                        <select onchange="SelectProducto()" class="form-control border-input" name="" id="idStock">
+                                            <option value=""></option>
+
+                                            {% for stock in stocks %}
+                                                <option class="text-capitalize" value="{{ stock.id }}">{{ stock.producto.codigo  }}-{{ stock.producto.titulo  }}-{{ stock.producto.tipoUnidad.tipo }}</option>
+
+                                            {% endfor %}
+
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="content table-responsive table-full-width">
+                                        <table id="tablaProductoVenta" class="table ">
+                                            <thead>
+                                            <tr>
+                                                <td>Producto</td>
+                                                <td>Stock</td>
+                                                <td>Tipo</td>
+                                                {#<td>PrecioVenta</td>#}
+                                                {#<td>PrecioDesc.</td>#}
+                                                <td>Cantidad</td>
+                                                <td>Precio(Unitario)</td>
+                                                <td >Agregá</td>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="header">
+                                <h4 class="title text-center">PRODUCTOS ELEGIDOS</h4>
+                            </div>
+                            <div class="content">
+
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="content table-responsive table-full-width">
+
+                                            <table id="tablaVenta" class="table table-responsive">
+                                                <thead>
+                                                <tr>
+                                                    <td class="text-center">Producto</td>
+                                                    <td class="text-center">Precio</td>
+                                                    <td class="text-center">Cantidad</td>
+                                                    <td class="text-center">Total</td>
+
+                                                    <td class="text-center">Eliminar</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="tablaVentaBody" class="text-center">
+
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div id="button" class="text-center ">
+                                    <a  class="btn btn-info btn-fill btn-wd"  href="{{ path('admin_venta_index') }}">Volver a la lista</a>
+                                    <button onclick="Facturar()" class="btn btn-success btn-fill btn-wd">Facturar</button>
+
+                                    <button onclick="cleara()" class="btn btn-warning btn-fill btn-wd">Nueva Factura</button>
+
+                                </div>
+                                </div>
+                                <div class="clearfix"></div>
+                            </div>
+
+
+
+                            {#<div class="clearfix"></div>#}
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+            </div>
+
+        </div>
+    </div>
+ {#   <h1>Ventum creation</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <input type="submit" value="Create" />
+    {{ form_end(form) }}
+
+    <ul>
+        <li>
+            <a href="{{ path('admin_venta_index') }}">Back to the list</a>
+        </li>
+    </ul>#}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function() { $("#idCliente").select2(); });
+        $(document).ready(function() { $("#idStock").select2(); });
+
+    </script>
+    <script type="text/javascript">
+        const tablaProductoVenta = "#tablaProductoVenta";
+        const tablaVenta = "#tablaVenta";
+
+        var agregadosArray=[];
+        var idCliente;
+        var total=0;
+        var idPdf=0;
+        var cantidadProducto;
+        var precio;
+        var cantidad=0;
+        var idCliente;
+        $(tablaProductoVenta + ' tbody').html('');
+        function SelectProducto(){
+            var id=$('#idStock').val();
+            cantidadProducto=0;
+            precio=0;
+
+            $(document).ready(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path ("admin_venta_getstock") }}",
+                    data:{idStock:id},
+                }).done(function (data) {
+                    var fila;
+                    cantidadProducto=data[0].cantidad;
+                    console.log(cantidadProducto);
+                    $(tablaProductoVenta + ' tbody').empty();
+                    console.log(data);
+                    for (var i = 0; i < data.length; i++) {
+                        fila = '<tr><td id="titulo">'+data[i].titulo+'</td><td>'+data[i].cantidad+'</td> <td>'+data[i].tipo+'</td><td><span class="text-danger text-center" id="span"></span><input type="number"  onkeyup="myFunction()" id="cantidad" class="form-control border-input  " ></td><td><input type="number"  id="precioTotal" class="form-control border-input" ></td><td><button class="btn btn-success btn-fill btn-wd" onclick="Agregar('+data[i].producto_id+')">Agregar</button></td></tr>';
+
+                        $(tablaProductoVenta + ' tbody').append(fila);
+
+                    }
+
+                    $('input[type="checkbox"]').on('change', function() {
+                        $('input[name="' + this.name + '"]').not(this).prop('checked', false);
+                    });
+                });
+
+            });
+        }
+
+
+        // function precio2(p) {
+        //     precio=p;
+        //     if (cantidad != ''){
+        //         $('#precioTotal').val(precio* cantidad)
+        //
+        //     }
+        // }
+        // function precio3(p) {
+        //     precio=p;
+        //     if (cantidad != ''){
+        //         $('#precioTotal').val(precio* cantidad)
+        //
+        //     }
+        // }
+
+        function myFunction() {
+             cantidad=$('#cantidad').val();
+             if ( parseInt(cantidad) <= parseInt(cantidadProducto)){
+                 $("#cantidad").css("background-color","");
+                 $('#span').text("");
+
+                 // $('#precioTotal').val(precio* cantidad);
+
+             } else{
+                 $("#cantidad").css("background-color","#FF8F5E");
+                 // $('#precioTotal').val(0);
+                 $('#span').text("Paso maximo de stock");
+
+
+             }
+
+        }
+        function Agregar(producto_id) {
+            if (cantidad !=0 ){
+                $( "#button" ).removeClass( "hide" );
+                idCliente=$('#idCliente').val();
+                var descripcion=$('#titulo').text();
+
+                var precioTotal=parseFloat($("#precioTotal").val())*cantidad;
+
+                agregadosArray.push({idProducto:producto_id,idCliente:idCliente,descripcion:descripcion,cantidad:cantidad,precioUnidad:$("#precioTotal").val(),precioTotal:precioTotal});
+                $(tablaVenta + ' tbody').html('');
+                console.log(agregadosArray);
+                var fila;
+                var filaTotal;
+                total=0;
+                for (var i = 0; i < agregadosArray.length; i++) {
+
+                    fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>' ;
+
+                    total=parseFloat(agregadosArray[i].precioTotal)+parseFloat(total);
+
+                    $(tablaVenta + ' tbody').append(fila);
+
+
+                }
+                filaTotal='<tr><td></td><td></td><td>Total:</td><td>$'+total+'</td><td></td></tr>';
+                $(tablaVenta + ' tbody').append(filaTotal);
+
+                $( "#total" ).text( "$"+total );
+            } else{
+                $.notify({
+                    icon: 'ti-check-box',
+                    message: "Complete la cantidad"
+
+                },{
+                    type: 'danger',
+                    timer: 4000
+                });
+            }
+
+
+        }
+        function Facturar() {
+            if (agregadosArray.length!=0){
+                $(document).ready(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "{{ path ("admin_venta_altaVenta") }}",
+                        data: {idCliente:idCliente,productoVenta:agregadosArray,total:total}
+                    }).done(function (data) {
+                        window.location.href = "http://127.0.0.1:8000/venta/pdfVenta/"+data;
+                        // window.open("http://127.0.0.1:8000/venta/pdfVenta/"+data, "_blank");
+
+                        $.notify({
+                            icon: 'ti-check-box',
+                            message: "Factura realizada con exito"
+
+                        },{
+                            type: 'success',
+                            timer: 4000
+                        });
+                    });
+
+                })
+            } else{
+                $.notify({
+                    icon: 'ti-check-box',
+                    message: "No agrego productos"
+
+                },{
+                    type: 'danger',
+                    timer: 4000
+                });
+            }
+
+        }
+        function cleara() {
+            location.reload();
+
+        }
+
+
+
+        function eliminar(id){
+
+            agregadosArray.splice(id, 1);
+            $("#tablaVentaBody").empty();
+
+            var fila;
+            total=0;
+            for (var i = 0; i < agregadosArray.length; i++) {
+                fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>';
+                /*
+                */
+                total=parseFloat(agregadosArray[i].precioTotal)+parseFloat(total);
+                $(tablaVenta + ' tbody').append(fila);
+
+
+            }
+
+
+            $( "#total" ).text( "$"+total );
+        }
+
+
+
+    </script>
+{% endblock %}
