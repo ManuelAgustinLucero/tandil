@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Cliente
@@ -19,6 +20,8 @@ class Cliente
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @JMS\Groups({"cliente_index", "venta_single"})
+
      */
     private $id;
 
@@ -26,6 +29,7 @@ class Cliente
      * @var string
      *
      * @ORM\Column(name="nombre", type="string", length=255)
+     * @JMS\Groups({"cliente_index", "venta_single"})
      */
     private $nombre;
 
@@ -33,6 +37,7 @@ class Cliente
      * @var string
      *
      * @ORM\Column(name="email", type="string", length=255,nullable=true)
+     * @JMS\Groups({"cliente_index", "venta_single"})
      */
     private $email;
 
@@ -248,6 +253,8 @@ class Cliente
 
     /**
      * @ORM\OneToMany(targetEntity="Venta", mappedBy="cliente")
+     * @JMS\Groups({"cliente_index", "venta_single"})
+
      */
     private $venta;
 

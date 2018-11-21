@@ -22,9 +22,9 @@ class DetalleVenta
     private $id;
 
     /**
-     * @var int
+     * @var float
      *
-     * @ORM\Column(name="cantidad", type="integer")
+     * @ORM\Column(name="cantidad", type="float")
      */
     private $cantidad;
 
@@ -36,16 +36,35 @@ class DetalleVenta
     private $precio;
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="comision", type="float")
+     */
+    private $comision;
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="fecha", type="datetime")
      */
     private $fecha;
 
+
+    /**
+     * @ORM\ManyToOne(targetEntity="Venta", inversedBy="detalleVenta")
+     * @ORM\JoinColumn(name="venta_id", referencedColumnName="id")
+     */
+    private $venta;
+    /**
+     * @ORM\ManyToOne(targetEntity="Producto", inversedBy="detalleVenta")
+     * @ORM\JoinColumn(name="producto_id", referencedColumnName="id")
+     */
+    private $producto;
+
+
     /**
      * Get id
      *
-     * @return int
+     * @return integer
      */
     public function getId()
     {
@@ -69,7 +88,7 @@ class DetalleVenta
     /**
      * Get cantidad
      *
-     * @return int
+     * @return integer
      */
     public function getCantidad()
     {
@@ -101,15 +120,28 @@ class DetalleVenta
     }
 
     /**
-     * @ORM\ManyToOne(targetEntity="Venta", inversedBy="detalleVenta")
-     * @ORM\JoinColumn(name="venta_id", referencedColumnName="id")
+     * Set fecha
+     *
+     * @param \DateTime $fecha
+     *
+     * @return DetalleVenta
      */
-    private $venta;
+    public function setFecha($fecha)
+    {
+        $this->fecha = $fecha;
+
+        return $this;
+    }
+
     /**
-     * @ORM\ManyToOne(targetEntity="Producto", inversedBy="detalleVenta")
-     * @ORM\JoinColumn(name="producto_id", referencedColumnName="id")
+     * Get fecha
+     *
+     * @return \DateTime
      */
-    private $producto;
+    public function getFecha()
+    {
+        return $this->fecha;
+    }
 
     /**
      * Set venta
@@ -160,26 +192,26 @@ class DetalleVenta
     }
 
     /**
-     * Set fecha
+     * Set comision
      *
-     * @param \DateTime $fecha
+     * @param float $comision
      *
      * @return DetalleVenta
      */
-    public function setFecha($fecha)
+    public function setComision($comision)
     {
-        $this->fecha = $fecha;
+        $this->comision = $comision;
 
         return $this;
     }
 
     /**
-     * Get fecha
+     * Get comision
      *
-     * @return \DateTime
+     * @return float
      */
-    public function getFecha()
+    public function getComision()
     {
-        return $this->fecha;
+        return $this->comision;
     }
 }

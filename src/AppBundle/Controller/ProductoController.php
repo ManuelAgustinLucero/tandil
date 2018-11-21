@@ -5,7 +5,10 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Producto;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Producto controller.
@@ -44,11 +47,22 @@ class ProductoController extends Controller
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($producto);
-            $em->flush();
 
-            return $this->redirectToRoute('admin_producto_show', array('id' => $producto->getId()));
+            $em = $this->getDoctrine()->getManager();
+            $productos = $em->getRepository('AppBundle:Producto')->findOneByCodigo($producto->getCodigo());
+            if ($productos){
+                $this->addFlash(
+                    'notice',
+                    'Producto con codigo ya existente!'
+
+                );
+            }else{
+                $em->persist($producto);
+                $em->flush();
+                return $this->redirectToRoute('admin_producto_show', array('id' => $producto->getId()));
+            }
+
+
         }
 
         return $this->render('producto/new.html.twig', array(
@@ -132,5 +146,113 @@ class ProductoController extends Controller
             ->setMethod('DELETE')
             ->getForm()
         ;
+    }
+    /**
+     * Creates a new producto entity.
+     *
+     * @Route("/movimiento/", name="admin_producto_moviminetos")
+     * @Method({"GET", "POST"})
+     */
+    public function movimientosAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $stock = $em->getRepository('AppBundle:Stock')->findAll();
+
+        return $this->render('movimientosProducto/movimientoProducto.html.twig', array(
+            'stocks' => $stock,
+        ));
+    }
+
+
+    /**
+     * Creates a new producto entity.
+     *
+     * @Route("/get/movimientoProducto/", name="admin_producto_get_moviminetos")
+     * @Method({"GET", "POST"})
+     */
+    public function getMovimientosAction(Request $request)
+    {
+        $producto = $request->request->get('producto');
+        $fecha1 = $request->request->get('desde');
+        $fecha2 = $request->request->get('hasta');
+
+        $f1=new \DateTime($fecha1);
+        $f2=new \DateTime($fecha2);
+
+        $f1=$f1->format('Y-m-d 00:00:00');
+        $f2=$f2->format('Y-m-d 23:59:00');
+
+
+
+        $em = $this->getDoctrine()->getManager();
+        $repository = $em->getRepository("AppBundle:Compra");
+        $query = $repository->createQueryBuilder('c')
+            ->select(array(
+                  'c.cantidad',
+                    'c.precioCompra',
+                    'c.fechaRegistro',
+                    'p.titulo'
+                )
+            )
+            ->innerJoin('AppBundle:Producto', 'p', 'WITH', 'p.id = c.producto')
+
+            ->where('c.producto = :productoId')
+            ->andWhere('c.fechaRegistro BETWEEN :desde AND :hasta')
+            ->setParameter('desde', $f1)
+            ->setParameter('hasta', $f2)
+            ->setParameter('productoId', $producto)
+            ->setMaxResults(10000)
+        ;
+        $compra=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        $repository = $em->getRepository("AppBundle:DetalleVenta");
+        $query = $repository->createQueryBuilder('dv')
+            ->select(array(
+                    'dv.cantidad',
+                    'dv.precio',
+                    'dv.fecha',
+                    'p.titulo'
+
+                )
+            )
+            ->innerJoin('AppBundle:Producto', 'p', 'WITH', 'p.id = dv.producto')
+            ->where('dv.producto = :productoId')
+            ->andWhere('dv.fecha BETWEEN :desde AND :hasta')
+            ->setParameter('desde', $f1)
+            ->setParameter('hasta', $f2)
+            ->setParameter('productoId', $producto)
+            ->setMaxResults(10000)
+        ;
+        $detalleVenta=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        $repository = $em->getRepository("AppBundle:Stock");
+        $query = $repository->createQueryBuilder('st')
+            ->select(array(
+                    'st.cantidad',
+                    'st.fechaActulizacion',
+                    'p.titulo',
+                    'pr.nombre'
+                )
+            )
+            ->innerJoin('AppBundle:Producto', 'p', 'WITH', 'p.id = st.producto')
+            ->innerJoin('AppBundle:Proveedor', 'pr', 'WITH', 'pr.id = st.proveedor')
+
+            ->where('st.producto = :productoId')
+            ->setParameter('productoId', $producto)
+            ->setMaxResults(10000)
+        ;
+        $stock=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        $data=array(
+            "compra"=>$compra,
+            "detalleVenta"=>$detalleVenta,
+            "stock"=>$stock
+        );
+        return new JsonResponse($data);
+
     }
 }

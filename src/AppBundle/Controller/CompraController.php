@@ -60,16 +60,18 @@ class CompraController extends Controller
             $em = $this->getDoctrine()->getManager();
             $em->persist($compra);
             $em->flush();
-            $stock= $em->getRepository('AppBundle:Stock')->findOneByProducto( $compra->getProducto()->getId());
+            $stock= $em->getRepository('AppBundle:Stock')->findOneBy(array('producto' => $compra->getProducto()->getId(),'proveedor'=>$compra->getProveedor()));
+            $producto= $em->getRepository('AppBundle:Producto')->find($compra->getProducto()->getId());
+            $producto->setImporte($compra->getPrecioCompra());
+            $em->persist($producto);
+            $em->flush();
 
             if ($stock){
                 $stock->setCantidad( $stock->getCantidad()+$compra->getCantidad());
                 $stock->setPrecioCosto($compra->getPrecioCompra());
-//                $stock->setPrecioVenta($compra->getPrecioVenta());
-//                $stock->setPrecioVentaDescuento($compra->getPrecioVentaDescuento());
                 $stock->setFechaActulizacion( new \DateTime('now'));
-
-                $stock->setCodigo("58585");
+                $stock->setCodigo($compra->getProducto()->getCodigo());
+                $stock->setProveedor($compra->getProveedor());
                 $em->persist($stock);
                 $em->flush();
 
@@ -87,9 +89,8 @@ class CompraController extends Controller
                 $stockNew->setFecha( new \DateTime('now'));
                 $stockNew->setFechaActulizacion( new \DateTime('now'));
                 $stockNew->setPrecioCosto($compra->getPrecioCompra());
-//                $stockNew->setPrecioVenta($compra->getPrecioVenta());
-//                $stockNew->setPrecioVentaDescuento($compra->getPrecioVentaDescuento());
-                $stockNew->setCodigo("5852");
+                $stockNew->setProveedor($compra->getProveedor());
+                $stockNew->setCodigo($compra->getProducto()->getCodigo());
 
                 $em->persist($stockNew);
                 $em->flush();
@@ -154,14 +155,19 @@ class CompraController extends Controller
     /**
      * Deletes a compra entity.
      *
-     * @Route("/{id}", name="admin_compra_delete")
+     * @Route("/{id}/delete", name="admin_compra_delete")
      * @Method("DELETE")
      */
     public function deleteAction(Request $request, Compra $compra)
     {
         $form = $this->createDeleteForm($compra);
         $form->handleRequest($request);
+        $compra->getCantidad();
 
+        $em = $this->getDoctrine()->getManager();
+        $stocks = $em->getRepository('AppBundle:Stock')->findOneByProducto($compra->getProducto());
+        $stocks->setCantidad($stocks->getCantidad()-$compra->getCantidad());
+        $em->flush();
         if ($form->isSubmitted() && $form->isValid()) {
             $em = $this->getDoctrine()->getManager();
             $em->remove($compra);

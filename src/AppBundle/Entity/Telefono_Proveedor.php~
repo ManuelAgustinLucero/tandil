@@ -68,4 +68,28 @@ class Telefono_Proveedor
      */
     private $proveedor;
 
+
+    /**
+     * Set proveedor
+     *
+     * @param \AppBundle\Entity\Proveedor $proveedor
+     *
+     * @return Telefono_Proveedor
+     */
+    public function setProveedor(\AppBundle\Entity\Proveedor $proveedor = null)
+    {
+        $this->proveedor = $proveedor;
+
+        return $this;
+    }
+
+    /**
+     * Get proveedor
+     *
+     * @return \AppBundle\Entity\Proveedor
+     */
+    public function getProveedor()
+    {
+        return $this->proveedor;
+    }
 }

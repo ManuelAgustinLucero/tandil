@@ -57,10 +57,17 @@ class Proveedor
      */
     private $telefono_proveedor;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Stock", mappedBy="proveedor")
+     */
+    private $stock;
+
+
     public function __construct()
     {
         $this->producto = new ArrayCollection();
         $this->telefono_proveedor = new ArrayCollection();
+        $this->stock = new ArrayCollection();
 
     }
 
@@ -180,7 +187,7 @@ class Proveedor
         return $this->compra;
     }
     public function __toString(){
-        return (string) $this->codigo ."-". $this->nombre;
+        return (string)   $this->nombre;
     }
 
     /**
@@ -255,5 +262,39 @@ class Proveedor
     public function getTelefonoProveedor()
     {
         return $this->telefono_proveedor;
+    }
+
+    /**
+     * Add stock
+     *
+     * @param \AppBundle\Entity\Stock $stock
+     *
+     * @return Proveedor
+     */
+    public function addStock(\AppBundle\Entity\Stock $stock)
+    {
+        $this->stock[] = $stock;
+
+        return $this;
+    }
+
+    /**
+     * Remove stock
+     *
+     * @param \AppBundle\Entity\Stock $stock
+     */
+    public function removeStock(\AppBundle\Entity\Stock $stock)
+    {
+        $this->stock->removeElement($stock);
+    }
+
+    /**
+     * Get stock
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getStock()
+    {
+        return $this->stock;
     }
 }

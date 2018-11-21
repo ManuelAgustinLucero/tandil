@@ -13,7 +13,7 @@ class VentaType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('total')->add('fecha')->add('cliente');
+        $builder->add('totalComision')->add('total')->add('fecha')->add('cliente');
     }/**
      * {@inheritdoc}
      */

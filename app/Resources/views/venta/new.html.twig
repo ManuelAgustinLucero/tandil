@@ -47,12 +47,12 @@
                                 </div>
                                 <div class="col-md-4 ">
                                     <div class="form-group text-center">
-                                        <label>Producto:</label>
+                                        <label>Producto en Stock:</label>
                                         <select onchange="SelectProducto()" class="form-control border-input" name="" id="idStock">
                                             <option value=""></option>
 
                                             {% for stock in stocks %}
-                                                <option class="text-capitalize" value="{{ stock.id }}">{{ stock.producto.codigo  }}-{{ stock.producto.titulo  }}-{{ stock.producto.tipoUnidad.tipo }}</option>
+                                                <option class="text-capitalize" value="{{ stock.id }}">Proveedor: {{ stock.proveedor  }} /Producto:  {{ stock.producto.codigo  }}-{{ stock.producto.titulo  }} / {{ stock.producto.tipoUnidad.tipo }}</option>
 
                                             {% endfor %}
 
@@ -73,6 +73,8 @@
                                                 {#<td>PrecioDesc.</td>#}
                                                 <td>Cantidad</td>
                                                 <td>Precio(Unitario)</td>
+                                                <td>Precio(Comision)</td>
+
                                                 <td >Agregá</td>
                                             </tr>
                                             </thead>
@@ -100,6 +102,7 @@
                                                     <td class="text-center">Precio</td>
                                                     <td class="text-center">Cantidad</td>
                                                     <td class="text-center">Total</td>
+                                                    <td class="text-center">Precio(Comision)</td>
 
                                                     <td class="text-center">Eliminar</td>
                                                 </tr>
@@ -166,13 +169,20 @@
         const tablaVenta = "#tablaVenta";
 
         var agregadosArray=[];
-        var idCliente;
+
+
+        if (JSON.parse(localStorage.getItem('venta'))!=null){
+            agregadosArray=JSON.parse(localStorage.getItem('venta'));
+        }
         var total=0;
+        var totalComision=0;
+
         var idPdf=0;
         var cantidadProducto;
         var precio;
         var cantidad=0;
-        var idCliente;
+        var idCliente=localStorage.getItem("idCliente");
+        inicial();
         $(tablaProductoVenta + ' tbody').html('');
         function SelectProducto(){
             var id=$('#idStock').val();
@@ -187,11 +197,9 @@
                 }).done(function (data) {
                     var fila;
                     cantidadProducto=data[0].cantidad;
-                    console.log(cantidadProducto);
                     $(tablaProductoVenta + ' tbody').empty();
-                    console.log(data);
                     for (var i = 0; i < data.length; i++) {
-                        fila = '<tr><td id="titulo">'+data[i].titulo+'</td><td>'+data[i].cantidad+'</td> <td>'+data[i].tipo+'</td><td><span class="text-danger text-center" id="span"></span><input type="number"  onkeyup="myFunction()" id="cantidad" class="form-control border-input  " ></td><td><input type="number"  id="precioTotal" class="form-control border-input" ></td><td><button class="btn btn-success btn-fill btn-wd" onclick="Agregar('+data[i].producto_id+')">Agregar</button></td></tr>';
+                        fila = '<tr><td id="titulo">'+data[i].titulo+'</td><td>'+data[i].cantidad+'</td> <td>'+data[i].tipo+'</td><td><span class="text-danger text-center" id="span"></span><input type="number"  onkeyup="myFunction()" id="cantidad" class="form-control border-input  " ></td><td><input type="number"  value="'+data[i].importe+'" id="precioTotal" class="form-control border-input" ></td><td><input type="number"  id="precioComision" class="form-control border-input" ></td><td><button class="btn btn-success btn-fill btn-wd" onclick="Agregar('+data[i].producto_id+')">Agregar</button></td></tr>';
 
                         $(tablaProductoVenta + ' tbody').append(fila);
 
@@ -206,20 +214,30 @@
         }
 
 
-        // function precio2(p) {
-        //     precio=p;
-        //     if (cantidad != ''){
-        //         $('#precioTotal').val(precio* cantidad)
-        //
-        //     }
-        // }
-        // function precio3(p) {
-        //     precio=p;
-        //     if (cantidad != ''){
-        //         $('#precioTotal').val(precio* cantidad)
-        //
-        //     }
-        // }
+        function inicial() {
+            if ( agregadosArray.length>0){
+                 $(tablaVenta + ' tbody').html('');
+                var fila;
+                var filaTotal;
+                total=0;
+                totalComision=0;
+                for (var i = 0; i < agregadosArray.length; i++) {
+
+                    fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td>$'+agregadosArray[i].precioComision+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>' ;
+
+                    total=parseFloat(agregadosArray[i].precioTotal)+parseFloat(total);
+                    totalComision=parseFloat(agregadosArray[i].precioComision)+parseFloat(totalComision);
+                    $(tablaVenta + ' tbody').append(fila);
+
+
+                }
+                filaTotal='<tr><td></td><td></td><td>Total:</td><td>$'+total+'</td><td>$'+totalComision+'</td></tr>';
+                $(tablaVenta + ' tbody').append(filaTotal);
+
+                $( "#total" ).text( "$"+total );
+            }
+
+        }
 
         function myFunction() {
              cantidad=$('#cantidad').val();
@@ -242,27 +260,34 @@
             if (cantidad !=0 ){
                 $( "#button" ).removeClass( "hide" );
                 idCliente=$('#idCliente').val();
+                localStorage.setItem('idCliente',idCliente);
                 var descripcion=$('#titulo').text();
 
                 var precioTotal=parseFloat($("#precioTotal").val())*cantidad;
 
-                agregadosArray.push({idProducto:producto_id,idCliente:idCliente,descripcion:descripcion,cantidad:cantidad,precioUnidad:$("#precioTotal").val(),precioTotal:precioTotal});
-                $(tablaVenta + ' tbody').html('');
+                agregadosArray.push({idProducto:producto_id,idCliente:idCliente,descripcion:descripcion,cantidad:cantidad,precioUnidad:$("#precioTotal").val(),precioComision:$("#precioComision").val(),precioTotal:precioTotal,idStock:$("#idStock").val()});
+                localStorage.setItem('venta', JSON.stringify(agregadosArray));
+
                 console.log(agregadosArray);
+                $(tablaVenta + ' tbody').html('');
                 var fila;
                 var filaTotal;
+
                 total=0;
+                totalComision=0;
+
                 for (var i = 0; i < agregadosArray.length; i++) {
 
-                    fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>' ;
+                    fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td>$'+agregadosArray[i].precioComision+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>' ;
 
                     total=parseFloat(agregadosArray[i].precioTotal)+parseFloat(total);
+                    totalComision=parseFloat(agregadosArray[i].precioComision)+parseFloat(totalComision);
 
                     $(tablaVenta + ' tbody').append(fila);
 
 
                 }
-                filaTotal='<tr><td></td><td></td><td>Total:</td><td>$'+total+'</td><td></td></tr>';
+                filaTotal='<tr><td></td><td></td><td>Total:</td><td>$'+total+'</td><td>$'+totalComision+'</td></tr>';
                 $(tablaVenta + ' tbody').append(filaTotal);
 
                 $( "#total" ).text( "$"+total );
@@ -277,7 +302,6 @@
                 });
             }
 
-
         }
         function Facturar() {
             if (agregadosArray.length!=0){
@@ -285,9 +309,12 @@
                     $.ajax({
                         type: "POST",
                         url: "{{ path ("admin_venta_altaVenta") }}",
-                        data: {idCliente:idCliente,productoVenta:agregadosArray,total:total}
+                        data: {idCliente:idCliente,productoVenta:agregadosArray,total:total,totalComision:totalComision}
                     }).done(function (data) {
-                        window.location.href = "http://127.0.0.1:8000/venta/pdfVenta/"+data;
+                        localStorage.removeItem("venta");
+                        localStorage.removeItem("idCliente");
+                        console.log(data);
+                        //window.location.href = "http://www.beniar.com.ar/venta/pdfVenta/"+data;
                         // window.open("http://127.0.0.1:8000/venta/pdfVenta/"+data, "_blank");
 
                         $.notify({
@@ -298,6 +325,8 @@
                             type: 'success',
                             timer: 4000
                         });
+                        location.reload();
+
                     });
 
                 })
@@ -324,19 +353,27 @@
 
             agregadosArray.splice(id, 1);
             $("#tablaVentaBody").empty();
+            localStorage.setItem('venta', JSON.stringify(agregadosArray));
 
             var fila;
+            var filaTotal;
+
             total=0;
+            totalComision=0;
+
             for (var i = 0; i < agregadosArray.length; i++) {
-                fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>';
+                fila = '<tr><td >'+agregadosArray[i].descripcion+'</td> <td>$'+agregadosArray[i].precioUnidad+'</td><td>'+agregadosArray[i].cantidad+'</td><td>$'+agregadosArray[i].precioTotal+'</td><td>$'+agregadosArray[i].precioComision+'</td><td><button onclick="eliminar('+i+')" class="btn btn-danger btn-fill btn-wd">Eliminar</button></td></tr>' ;
                 /*
                 */
                 total=parseFloat(agregadosArray[i].precioTotal)+parseFloat(total);
+                totalComision=parseFloat(agregadosArray[i].precioComision)+parseFloat(totalComision);
                 $(tablaVenta + ' tbody').append(fila);
 
 
             }
 
+            filaTotal='<tr><td></td><td></td><td>Total:</td><td>$'+total+'</td><td>$'+totalComision+'</td></tr>';
+            $(tablaVenta + ' tbody').append(filaTotal);
 
             $( "#total" ).text( "$"+total );
         }

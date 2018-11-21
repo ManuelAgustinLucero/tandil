@@ -79,14 +79,15 @@ class ExportPdfFactura extends Controller
         $pdf->SetXY(10, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Código'), 1, 'C');
         $pdf->SetXY(30, 63);
-        $pdf->MultiCell(110, 5, utf8_decode('Nombre'), 1, 'L');
-        $pdf->SetXY(140, 63);
+        $pdf->MultiCell(80, 5, utf8_decode('Nombre'), 1, 'L');
+        $pdf->SetXY(110, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Precio Unit.'), 1, 'L');
-        $pdf->SetXY(160, 63);
+        $pdf->SetXY(130, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Cantidad'), 1, 'L');
-        $pdf->SetXY(180, 63);
+        $pdf->SetXY(150, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Total'), 1, 'L');
-
+        $pdf->SetXY(170, 63);
+        $pdf->MultiCell(30, 5, utf8_decode('TotalComision'), 1, 'L');
 
         $posY = 70;
 
@@ -107,7 +108,7 @@ class ExportPdfFactura extends Controller
             $cant++;
         }
 //        $this->createLineDeuda("", $venta->getTotalPagado(), $posY,$pdf);
-        $this->createLineTotal($venta->getTotal(), $posY, $pdf);
+        $this->createLineTotal($venta->getTotal(),$venta->getTotalComision(), $posY, $pdf);
 
 //        $pdf->SetFont('Arial', '', 12);
 //        $pdf->SetXY(10, $posY + 10);
@@ -163,13 +164,17 @@ class ExportPdfFactura extends Controller
             $pdf->SetXY(10, 63);
             $pdf->MultiCell(20, 5, utf8_decode('Código'), 1, 'C');
             $pdf->SetXY(30, 63);
-            $pdf->MultiCell(110, 5, utf8_decode('Nombre'), 1, 'L');
-            $pdf->SetXY(140, 63);
+            $pdf->MultiCell(80, 5, utf8_decode('Nombre'), 1, 'L');
+            $pdf->SetXY(110, 63);
             $pdf->MultiCell(20, 5, utf8_decode('Precio Unit.'), 1, 'L');
-            $pdf->SetXY(160, 63);
+            $pdf->SetXY(130, 63);
             $pdf->MultiCell(20, 5, utf8_decode('Cantidad'), 1, 'L');
-            $pdf->SetXY(180, 63);
+            $pdf->SetXY(150, 63);
             $pdf->MultiCell(20, 5, utf8_decode('Total'), 1, 'L');
+            $pdf->SetXY(170, 63);
+            $pdf->MultiCell(30, 5, utf8_decode('TotalComision'), 1, 'L');
+
+
 
 
             $posY = 70;
@@ -192,7 +197,7 @@ class ExportPdfFactura extends Controller
                 $cant++;
             }
 
-            $this->createLineTotal($venta->getTotal(), $posY, $pdf);
+            $this->createLineTotal($venta->getTotal(),$venta->getTotalComision(), $posY, $pdf);
 
 //
 //            $this->createRetirementTable($posY,$pdf);
@@ -234,13 +239,17 @@ class ExportPdfFactura extends Controller
             $pdf->SetXY(10, 63 + $posYCopia);
             $pdf->MultiCell(20, 5, utf8_decode('Código'), 1, 'C');
             $pdf->SetXY(30, 63 + $posYCopia);
-            $pdf->MultiCell(110, 5, utf8_decode('Nombre'), 1, 'L');
-            $pdf->SetXY(140, 63 + $posYCopia);
+            $pdf->MultiCell(80, 5, utf8_decode('Nombre'), 1, 'L');
+            $pdf->SetXY(110, 63 + $posYCopia);
             $pdf->MultiCell(20, 5, utf8_decode('Precio Unit.'), 1, 'L');
-            $pdf->SetXY(160, 63 + $posYCopia);
+            $pdf->SetXY(130, 63 + $posYCopia);
             $pdf->MultiCell(20, 5, utf8_decode('Cantidad'), 1, 'L');
-            $pdf->SetXY(180, 63 + $posYCopia);
+            $pdf->SetXY(150, 63 + $posYCopia);
             $pdf->MultiCell(20, 5, utf8_decode('Total'), 1, 'L');
+            $pdf->SetXY(170, 63+ $posYCopia);
+            $pdf->MultiCell(30, 5, utf8_decode('TotalComision'), 1, 'L');
+
+
 
 
             $posYCopia = 70 + $posYCopia;
@@ -256,7 +265,8 @@ class ExportPdfFactura extends Controller
             }
 
 //            $this->createLineDeuda("", $venta->getTotalPagado(), $posYCopia,$pdf);
-            $this->createLineTotal($venta->getTotal(), $posYCopia, $pdf);
+            $this->createLineTotal($venta->getTotal(),$venta->getTotalComision(), $posYCopia, $pdf);
+
             $posYCopia += 5;
             $cant++;
 //
@@ -272,19 +282,21 @@ class ExportPdfFactura extends Controller
         return new Response($pdf->Output(), 200, array(
             'Content-Type' => 'application/pdf'));
     }
-    function createLineTotal($total, $posY,$pdf)
+    function createLineTotal($total,$totalComision, $posY,$pdf)
     {
         $pdf->SetFont('Arial', '',14);
         $pdf->SetXY(10, $posY);
-        $pdf->MultiCell(20, 5.2, "", 1, 'C');
+        $pdf->MultiCell(20, 6.2, "", 1, 'C');
         $pdf->SetXY(30, $posY);
-        $pdf->MultiCell(110, 5.2, "", 1, 'L');
-        $pdf->SetXY(140, $posY);
-        $pdf->MultiCell(20, 5.2, "", 1, 'C');
-        $pdf->SetXY(160, $posY);
-        $pdf->MultiCell(20, 5.2, "Total:", 1, 'C');
-        $pdf->SetXY(180, $posY);
-        $pdf->MultiCell(20, 5.2, "$" . utf8_decode($total), 1, 'C');
+        $pdf->MultiCell(80, 6.2, "", 1, 'L');
+        $pdf->SetXY(110, $posY);
+        $pdf->MultiCell(20, 6.2, "", 1, 'C');
+        $pdf->SetXY(130, $posY);
+        $pdf->MultiCell(20, 6.2, "Total:", 1, 'C');
+        $pdf->SetXY(150, $posY);
+        $pdf->MultiCell(20, 6.2, "$" . utf8_decode($total), 1, 'C');
+        $pdf->SetXY(170, $posY);
+        $pdf->MultiCell(30, 6.2, "$" . utf8_decode($totalComision), 1, 'C');
     }
 
     function createLineTable($key, $producto, $posY,$pdf)
@@ -295,48 +307,52 @@ class ExportPdfFactura extends Controller
         $pdf->SetXY(10, $posY);
         $pdf->MultiCell(20, 5, ($producto->getProducto()->getId()), 1, 'C');
         $pdf->SetXY(30, $posY);
-        $pdf->MultiCell(110, 5,  $producto->getProducto()->getTitulo(), 1, 'L');
-        $pdf->SetXY(140, $posY);
+        $pdf->MultiCell(80, 5,  $producto->getProducto()->getTitulo(), 1, 'L');
+        $pdf->SetXY(110, $posY);
         $pdf->MultiCell(20, 5, "$" . $producto->getPrecio(), 1, 'C');
-        $pdf->SetXY(160, $posY);
+        $pdf->SetXY(130, $posY);
         $pdf->MultiCell(20, 5, $producto->getCantidad(), 1, 'C');
-        $pdf->SetXY(180, $posY);
+        $pdf->SetXY(150, $posY);
         $pdf->MultiCell(20, 5, "$" . $producto->getPrecio()*$producto->getCantidad(), 1, 'C');
+        $pdf->SetXY(170, $posY);
+        $pdf->MultiCell(30,5, "$" . $producto->getComision(), 1, 'C');
+
+
 
     }
 
     function createLineDeuda($key, $deuda, $posY,$pdf)
     {
 
-        $pdf->SetFont('Arial', '', 7);
-
-        $pdf->SetXY(10, $posY);
-        $pdf->MultiCell(20, 5, utf8_decode($key), 1, 'C');
-        $pdf->SetXY(30, $posY);
-        $pdf->MultiCell(110, 5, utf8_decode("Deuda"), 1, 'L');
-        $pdf->SetXY(140, $posY);
-        $pdf->MultiCell(20, 5, "$" . utf8_decode($deuda), 1, 'C');
-        $pdf->SetXY(160, $posY);
-        $pdf->MultiCell(20, 5, utf8_decode(""), 1, 'C');
-        $pdf->SetXY(180, $posY);
-        $pdf->MultiCell(20, 5, utf8_decode(""), 1, 'C');
+//        $pdf->SetFont('Arial', '', 7);
+//
+//        $pdf->SetXY(10, $posY);
+//        $pdf->MultiCell(20, 5, utf8_decode($key), 1, 'C');
+//        $pdf->SetXY(30, $posY);
+//        $pdf->MultiCell(110, 5, utf8_decode("Deuda"), 1, 'L');
+//        $pdf->SetXY(140, $posY);
+//        $pdf->MultiCell(20, 5, "$" . utf8_decode($deuda), 1, 'C');
+//        $pdf->SetXY(160, $posY);
+//        $pdf->MultiCell(20, 5, utf8_decode(""), 1, 'C');
+//        $pdf->SetXY(180, $posY);
+//        $pdf->MultiCell(20, 5, utf8_decode(""), 1, 'C');
 
     }
 
     function createBlackLineTable($pdf,$posY)
     {
-        $pdf->SetFont('Arial', '', 7);
-
-        $pdf->SetXY(10, $posY);
-        $pdf->MultiCell(20, 5, '', 1, 'C');
-        $pdf->SetXY(30, $posY);
-        $pdf->MultiCell(110, 5, '', 1, 'L');
-        $pdf->SetXY(140, $posY);
-        $pdf->MultiCell(20, 5, '', 1, 'L');
-        $pdf->SetXY(160, $posY);
-        $pdf->MultiCell(20, 5, '', 1, 'C');
-        $pdf->SetXY(180, $posY);
-        $pdf->MultiCell(20, 5, '', 1, 'C');
+//        $pdf->SetFont('Arial', '', 7);
+//
+//        $pdf->SetXY(10, $posY);
+//        $pdf->MultiCell(20, 5, '', 1, 'C');
+//        $pdf->SetXY(30, $posY);
+//        $pdf->MultiCell(110, 5, '', 1, 'L');
+//        $pdf->SetXY(140, $posY);
+//        $pdf->MultiCell(20, 5, '', 1, 'L');
+//        $pdf->SetXY(160, $posY);
+//        $pdf->MultiCell(20, 5, '', 1, 'C');
+//        $pdf->SetXY(180, $posY);
+//        $pdf->MultiCell(20, 5, '', 1, 'C');
     }
 
     function createRetirementTable($posY,$pdf)
@@ -368,13 +384,17 @@ class ExportPdfFactura extends Controller
         $pdf->SetXY(10, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Código'), 1, 'C');
         $pdf->SetXY(30, 63);
-        $pdf->MultiCell(110, 5, utf8_decode('Nombre'), 1, 'L');
-        $pdf->SetXY(140, 63);
+        $pdf->MultiCell(80, 5, utf8_decode('Nombre'), 1, 'L');
+        $pdf->SetXY(110, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Precio Unit.'), 1, 'L');
-        $pdf->SetXY(160, 63);
+        $pdf->SetXY(130, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Cantidad'), 1, 'L');
-        $pdf->SetXY(180, 63);
+        $pdf->SetXY(150, 63);
         $pdf->MultiCell(20, 5, utf8_decode('Total'), 1, 'L');
+        $pdf->SetXY(170, 63);
+        $pdf->MultiCell(30, 5, utf8_decode('TotalComision'), 1, 'L');
+
+
 
     }
 }

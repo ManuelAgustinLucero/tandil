@@ -265,7 +265,11 @@ class Stock
 
         return $this;
     }
-
+    /**
+     * @ORM\ManyToOne(targetEntity="Proveedor", inversedBy="stock")
+     * @ORM\JoinColumn(name="proveedor_id", referencedColumnName="id")
+     */
+    private $proveedor;
     /**
      * Get codigo
      *
@@ -274,5 +278,29 @@ class Stock
     public function getCodigo()
     {
         return $this->codigo;
+    }
+
+    /**
+     * Set proveedor
+     *
+     * @param \AppBundle\Entity\Proveedor $proveedor
+     *
+     * @return Stock
+     */
+    public function setProveedor(\AppBundle\Entity\Proveedor $proveedor = null)
+    {
+        $this->proveedor = $proveedor;
+
+        return $this;
+    }
+
+    /**
+     * Get proveedor
+     *
+     * @return \AppBundle\Entity\Proveedor
+     */
+    public function getProveedor()
+    {
+        return $this->proveedor;
     }
 }

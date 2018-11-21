@@ -29,7 +29,7 @@
                                 <tr>
                                     <th class="text-center">Venta</th>
                                     <th class="text-center">Cliente</th>
-
+                                    <th class="text-center">Total-Comision</th>
                                     <th class="text-center">Total</th>
                                     <th class="text-center">Fecha</th>
                                     <th class="text-center">Aciones</th>
@@ -40,6 +40,7 @@
                                     <tr>
                                         <td class="text-center"><a href="{{ path('admin_venta_show', { 'id': ventum.id }) }}">{{ ventum.id }}</a></td>
                                         <td class="text-center">{{ ventum.cliente }}</td>
+                                        <td class="text-center">${{ ventum.totalComision }}</td>
 
                                         <td class="text-center">${{ ventum.total }}</td>
 
@@ -48,6 +49,8 @@
 
                                             {#<a class="btn btn-link btn-primary" href="{{ path('admin_venta_show', { 'id': ventum.id }) }}">Detalle</a>#}
                                             <a class="btn btn-info btn-fill btn-wd text-center" target="_blank" href="{{ path('pdfVenta', { 'id': ventum.id }) }}">Export Pdf</a>
+                                            <a class="btn btn-warning btn-fill btn-wd text-center"href="{{ path('admin_venta_edit', { 'id': ventum.id }) }}">Editar Venta</a>
+                                            <a class="btn btn-danger btn-fill btn-wd text-center"href="{{ path('admin_venta_delete', { 'id': ventum.id }) }}">Cancelar Venta</a>
 
                                         </td>
                                     </tr>
@@ -109,19 +112,19 @@
                 {
                     extend: 'csvHtml5',
                     exportOptions: {
-                        columns: [   0,1,2,3 ]
+                        columns: [   0,1,2,3,4 ]
                     }
                 },
                 {
                     extend: 'excelHtml5',
                     exportOptions: {
-                        columns: [   0,1,2,3 ]
+                        columns: [   0,1,2,3,4 ]
                     }
                 },
                 {
                     extend: 'pdfHtml5',
                     exportOptions: {
-                        columns: [   0,1,2,3 ]
+                        columns: [   0,1,2,3,4 ]
 
                     },
                     pageSize: 'LEGAL'
@@ -130,7 +133,7 @@
                 {
                     extend: 'print',
                     exportOptions: {
-                        columns: [   0,1,2,3 ]
+                        columns: [   0,1,2,3,4 ]
                     }
                 }
 

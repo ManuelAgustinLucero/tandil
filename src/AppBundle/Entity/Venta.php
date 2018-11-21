@@ -4,6 +4,7 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use JMS\Serializer\Annotation as JMS;
 
 /**
  * Venta
@@ -19,13 +20,22 @@ class Venta
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
+     * @JMS\Groups({"cliente_index", "venta_single"})
+
      */
     private $id;
-
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="totalComision", type="float")
+     * @JMS\Groups({"cliente_index", "venta_single"})
+     */
+    private $totalComision;
     /**
      * @var float
      *
      * @ORM\Column(name="total", type="float")
+     * @JMS\Groups({"cliente_index", "venta_single"})
      */
     private $total;
 
@@ -33,6 +43,8 @@ class Venta
      * @var \DateTime
      *
      * @ORM\Column(name="fecha", type="datetime")
+     * @JMS\Groups({"cliente_index", "venta_single"})
+
      */
     private $fecha;
 
@@ -102,6 +114,7 @@ class Venta
 
     /**
      * @ORM\OneToMany(targetEntity="DetalleVenta", mappedBy="venta")
+     * @JMS\Groups({"cliente_index", "venta_single"})
      */
     private $detalleVenta;
 
@@ -166,5 +179,29 @@ class Venta
     public function getDetalleVenta()
     {
         return $this->detalleVenta;
+    }
+
+    /**
+     * Set totalComision
+     *
+     * @param float $totalComision
+     *
+     * @return Venta
+     */
+    public function setTotalComision($totalComision)
+    {
+        $this->totalComision = $totalComision;
+
+        return $this;
+    }
+
+    /**
+     * Get totalComision
+     *
+     * @return float
+     */
+    public function getTotalComision()
+    {
+        return $this->totalComision;
     }
 }

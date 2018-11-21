@@ -17,6 +17,7 @@
                             <table id="stock" class="table table-striped">
                                 <thead>
                                 <tr>
+                                    <th class="text-center">Proveedor</th>
                                     <th class="text-center">Producto</th>
                                     <th class="text-center">Cantidad</th>
                                     {#<th class="text-center">Precio Venta</th>#}
@@ -25,12 +26,13 @@
 
                                     <th class="text-center">Fecha Actulizacion</th>
 
-                                    <th class="text-center">Actions</th>
+                                    {#<th class="text-center">Actions</th>#}
                                 </tr>
                                 </thead>
                                 <tbody>
                                 {% for stock in stocks %}
                                     <tr class="text-center">
+                                        <td>{{ stock.proveedor }}</td>
                                         <td>{{ stock.producto }}</td>
                                         <td>{{ stock.cantidad }}</td>
                                         {#<td>${{ stock.precioVenta }}</td>#}
@@ -40,13 +42,13 @@
                                         {#<td>{{ stock.codigo}}</td>#}
 
                                         <td>{% if stock.fechaActulizacion %}{{ stock.fechaActulizacion|date('Y-m-d H:i:s') }}{% endif %}</td>
-                                        <td>
+                                        {#<td>#}
 
-                                                    <a href="{{ path('admin_stock_show', { 'id': stock.id }) }}">Detalle</a>
-                                            <br>
-                                                    <a href="{{ path('admin_stock_edit', { 'id': stock.id }) }}">Editar</a>
+                                                    {#<a href="{{ path('admin_stock_show', { 'id': stock.id }) }}">Detalle</a>#}
+                                            {#<br>#}
+                                                    {#<a href="{{ path('admin_stock_edit', { 'id': stock.id }) }}">Editar</a>#}
 
-                                        </td>
+                                        {#</td>#}
                                     </tr>
                                 {% endfor %}
                                 </tbody>

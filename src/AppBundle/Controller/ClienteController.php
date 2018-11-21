@@ -3,9 +3,13 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Entity\Cliente;
+use JMS\Serializer\SerializationContext;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Cliente controller.
@@ -134,5 +138,131 @@ class ClienteController extends Controller
             ->setMethod('DELETE')
             ->getForm()
         ;
+    }
+
+    /**
+     * Creates a new producto entity.
+     *
+     * @Route("/movimiento/", name="admin_cliente_moviminetos")
+     * @Method({"GET", "POST"})
+     */
+    public function movimientosClienteAction(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+
+        $clientes = $em->getRepository('AppBundle:Cliente')->findAll();
+
+        return $this->render('movimientosCliente/movimientosCliente.html.twig', array(
+            'clientes' => $clientes,
+        ));
+    }
+
+    /**
+     * Creates a new producto entity.
+     *
+     * @Route("/get/movimientoProducto/", name="admin_cliente_get_moviminetos")
+     * @Method({"GET", "POST"})
+     */
+    public function getClienteMovimientosAction(Request $request)
+    {
+        $cliente = $request->request->get('producto');
+        $fecha1 = $request->request->get('desde');
+        $fecha2 = $request->request->get('hasta');
+
+        $f1=new \DateTime($fecha1);
+        $f2=new \DateTime($fecha2);
+
+        $f1=$f1->format('Y-m-d 00:00:00');
+        $f2=$f2->format('Y-m-d 23:59:00');
+
+
+
+        $em = $this->getDoctrine()->getManager();
+
+        $repository = $em->getRepository("AppBundle:Venta");
+        $query = $repository->createQueryBuilder('v')
+            ->select(array(
+                    'dv.cantidad',
+                    'dv.precio',
+                    'dv.fecha',
+                    'p.titulo'
+                )
+            )
+            ->innerJoin('AppBundle:DetalleVenta', 'dv', 'WITH', 'dv.venta = v.id')
+            ->innerJoin('AppBundle:Producto', 'p', 'WITH', 'p.id = dv.producto')
+
+            ->where('v.cliente = :clienteId')
+            ->andWhere('v.fecha BETWEEN :desde AND :hasta')
+            ->setParameter('desde', $f1)
+            ->setParameter('hasta', $f2)
+            ->setParameter('clienteId', $cliente)
+            ->setMaxResults(10000)
+        ;
+        $detalle=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        $query = $repository->createQueryBuilder('v')
+            ->select(array(
+                    'v',
+
+                )
+            )
+
+            ->where('v.cliente = :clienteId')
+            ->andWhere('v.fecha BETWEEN :desde AND :hasta')
+            ->setParameter('desde', $f1)
+            ->setParameter('hasta', $f2)
+            ->setParameter('clienteId', $cliente)
+            ->setMaxResults(10000)
+        ;
+        $ventas=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+        $data=array(
+            "detalleVenta"=>$detalle,
+            "ventas"=>$ventas
+
+        );
+        return new JsonResponse($data);
+
+    }
+
+    /**
+     * Creates a new producto entity.
+     *
+     * @Route("/get/movimientoProducto/detalle/", name="admin_cliente_get_moviminetos_detalle")
+     * @Method({"GET", "POST"})
+     */
+    public function getClienteDetalleMovimientosAction(Request $request)
+    {
+        $id= $request->request->get('id');
+
+
+
+
+        $em = $this->getDoctrine()->getManager();
+
+        $repository = $em->getRepository("AppBundle:DetalleVenta");
+        $query = $repository->createQueryBuilder('dv')
+            ->select(array(
+                    'dv.cantidad',
+                    'dv.precio',
+                    'dv.fecha',
+                    'p.titulo'
+                )
+            )
+            ->innerJoin('AppBundle:Producto', 'p', 'WITH', 'p.id = dv.producto')
+
+            ->where('dv.venta = :id')
+            ->setParameter('id', $id)
+            ->setMaxResults(10000)
+        ;
+        $detalle=$query->getQuery()->getResult(\Doctrine\ORM\Query::HYDRATE_ARRAY);
+
+
+        $data=array(
+            "detalleVenta"=>$detalle,
+        );
+        return new JsonResponse($data);
+
     }
 }

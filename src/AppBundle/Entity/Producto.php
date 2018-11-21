@@ -38,6 +38,13 @@ class Producto
 
 
     /**
+     * @var float
+     *
+     * @ORM\Column(name="importe", type="float")
+     */
+    private $importe;
+
+    /**
      * Get id
      *
      * @return int
@@ -290,5 +297,29 @@ class Producto
     public function getDetalleVenta()
     {
         return $this->detalleVenta;
+    }
+
+    /**
+     * Set importe
+     *
+     * @param float $importe
+     *
+     * @return Producto
+     */
+    public function setImporte($importe)
+    {
+        $this->importe = $importe;
+
+        return $this;
+    }
+
+    /**
+     * Get importe
+     *
+     * @return float
+     */
+    public function getImporte()
+    {
+        return $this->importe;
     }
 }

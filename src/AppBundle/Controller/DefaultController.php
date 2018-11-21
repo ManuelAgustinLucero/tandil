@@ -40,9 +40,6 @@ class DefaultController extends Controller
     {
         $idProducto= $request->request->get('idProducto');
         $anio= $request->request->get('anio');
-
-
-
         $em = $this->getDoctrine()->getManager();
         $db = $em->getConnection();
         $query ="SELECT COUNT(*) AS contador,  MONTH(fecha) AS mes,SUM(precio * cantidad) as total,SUM(cantidad) as cantidad FROM detalle_venta WHERE YEAR(fecha)= $anio and detalle_venta.producto_id=$idProducto GROUP BY MONTH(fecha) ORDER BY MONTH(fecha) ASC";
